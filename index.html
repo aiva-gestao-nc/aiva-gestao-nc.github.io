@@ -135,7 +135,7 @@
     </div>
 
     <div class="status" id="status">
-      Iniciando o sistema AIVA...
+        Carregando...
     </div>
 
     <div class="aviso" id="aviso">
@@ -176,7 +176,7 @@
         window.location.replace(destino);
 
       } catch (erro) {
-        status.textContent = "Iniciando o sistema AIVA...";
+        status.textContent = "Carregando...";
 
         if (tentativas >= 10) {
           aviso.textContent =
