@@ -1,0 +1,148 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AIVA | Gestão de NC</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #101010;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, sans-serif;
+      color: white;
+    }
+
+    .container {
+      width: min(100%, 650px);
+      padding: 20px;
+      text-align: center;
+    }
+
+    .imagem {
+      width: 100%;
+      max-height: 72vh;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .barra {
+      height: 8px;
+      background: #303030;
+      border-radius: 20px;
+      overflow: hidden;
+      margin: 20px auto;
+    }
+
+    .progresso {
+      width: 35%;
+      height: 100%;
+      background: linear-gradient(90deg, #287c15, #70ee39);
+      border-radius: 20px;
+      animation: carregar 1.8s ease-in-out infinite alternate;
+    }
+
+    @keyframes carregar {
+      from { transform: translateX(-100%); }
+      to { transform: translateX(290%); }
+    }
+
+    .status {
+      font-size: 15px;
+      color: #dddddd;
+    }
+
+    .aviso {
+      font-size: 12px;
+      color: #aaaaaa;
+      margin-top: 14px;
+    }
+
+    .botao {
+      display: inline-block;
+      margin-top: 18px;
+      padding: 11px 20px;
+      border: 1px solid #65d834;
+      border-radius: 8px;
+      color: white;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <img
+      class="imagem"
+      src="Tela%20de%20Carregamento%20AIVA%20Lubrificantes.png"
+      alt="AIVA Lubrificantes - Gestão de NC"
+    >
+
+    <div class="barra">
+      <div class="progresso"></div>
+    </div>
+
+    <div class="status" id="status">
+      Iniciando o sistema AIVA...
+    </div>
+
+    <div class="aviso" id="aviso">
+      Aguarde enquanto o servidor é preparado.
+    </div>
+
+    <a class="botao"
+       href="https://gestao-nc-aiva.onrender.com">
+      Abrir sistema manualmente
+    </a>
+  </main>
+
+  <script>
+    const destino = "https://gestao-nc-aiva.onrender.com";
+    const status = document.getElementById("status");
+    const aviso = document.getElementById("aviso");
+
+    let tentativas = 0;
+
+    async function verificarSistema() {
+      tentativas++;
+
+      const controlador = new AbortController();
+      const limite = setTimeout(
+        () => controlador.abort(), 12000
+      );
+
+      try {
+        // no-cors permite iniciar a requisicao,
+        // mas nao confirma o status HTTP.
+        await fetch(destino + "/?wake=1&t=" + Date.now(), {
+          mode: "no-cors",
+          cache: "no-store",
+          signal: controlador.signal
+        });
+
+        status.textContent = "Abrindo o AIVA...";
+        window.location.replace(destino);
+
+      } catch (erro) {
+        status.textContent = "Iniciando o sistema AIVA...";
+
+        if (tentativas >= 10) {
+          aviso.textContent =
+            "O servidor está demorando. Continue aguardando ou use o botão abaixo.";
+        }
+
+        setTimeout(verificarSistema, 5000);
+      } finally {
+        clearTimeout(limite);
+      }
+    }
+
+    verificarSistema();
+  </script>
+</body>
+</html>
